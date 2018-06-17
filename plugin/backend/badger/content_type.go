@@ -8,22 +8,13 @@ import (
 
 	// external
 	"github.com/json-iterator/go"
-	"github.com/k0kubun/pp"
 	"github.com/opennota/substring"
 	"github.com/rai-project/linguist"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/match"
 	"github.com/wttw/orderedheaders"
 	"gopkg.in/src-d/enry.v1"
 	yaml "gopkg.in/yaml.v2"
 )
-
-/*
-	Refs:
-	- https://github.com/martinlindhe/formats/blob/master/parse/archive/arc_lzma.go
-	- https://raw.githubusercontent.com/mohae/magicnum/master/compress/compress_test.go
-	- https://github.com/kyurdakok/go-detect/blob/master/main.go
-*/
 
 func SubString(pattern string, in []byte) bool {
 	m := substring.NewMatcher(pattern)
@@ -38,30 +29,21 @@ func reader(s string) *textproto.Reader {
 	return textproto.NewReader(bufio.NewReader(strings.NewReader(s)))
 }
 
-func ReadHeader(content string) {
+func ReadHeader(content string) error {
 	r := reader(content)
 	hdrs, err := orderedheaders.ReadHeader(r)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"content": content,
-		}).Errorln("badgercache.ReadHeader(), ERROR: ", err)
+		return err
 	}
-	pp.Println(hdrs)
-	return
+	return nil
 }
 
 func DetectLang(content string) string {
 	lang := linguist.Detect(content)
-	log.WithFields(log.Fields{
-		"lang": lang,
-	}).Info("badgercache.DetectLang()")
 	return lang
 }
 
 func DetectType(name string, content string) (string, bool) {
-	log.WithFields(log.Fields{
-		"name": name,
-	}).Info("badgercache.DetectType()")
 	lang, safe := enry.GetLanguageByContent(name, []byte(content))
 	return lang, safe
 }

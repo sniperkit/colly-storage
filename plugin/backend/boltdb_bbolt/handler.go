@@ -1,51 +1,34 @@
 package bboltstorage
 
 import (
+	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 	"sync"
 	"time"
 
-	"bytes"
-	"compress/gzip"
-	"io/ioutil"
-
-	bolt "github.com/coreos/bbolt"
-	log "github.com/sirupsen/logrus"
-)
-
-/*
-	Refs:
-	- https://github.com/br0xen/boltbrowser
-	- https://github.com/aerth/fforum/blob/master/forum.go
-	- https://github.com/Everlag/poeitemstore/blob/master/stash/stash.go (encoding json)
-	- https://github.com/joltdb/jolt/blob/master/api.go
-	- https://github.com/gqf2008/btwan/blob/master/cmd/migrate/migrate.go
-*/
-
-const (
-	bktName                     string = "httpcache"
-	bktDir                      string = "./shared/data/cache/.bbolt"
-	defaultStorageFileExtension string = ".bbolt"
+	// external
+	bbolt "github.com/coreos/bbolt"
 )
 
 var (
-	defaultStorageDir  string = filepath.Join(bktDir, bktName)
-	defaultStorageFile string = fmt.Sprintf("%s/%s%s", defaultStorageDir, bktName, defaultStorageFileExtension)
+	defaultStorageDir  string = filepath.Join(storagePrefixPath, storageBucketName)
+	defaultStorageFile string = fmt.Sprintf("%s/%s%s", storagePrefixPath, storageBucketName, storageFileExtension)
 )
 
-// Cache is an implementation of httpcache.Cache that uses a bolt database.
-type Cache struct {
+// Store is an implementation of httpstore.Store that uses a bolt database.
+type Store struct {
 	// sync.Mutex
 	sync.RWMutex
-	db          *bolt.DB
+	db          *bbolt.DB
 	storagePath string
 	bucketName  string
 	debug       bool
 	stats       bool
 	compress    bool
-	// bucket      *bolt.Bucket
 }
 
 type Check struct {
@@ -61,13 +44,13 @@ type Check struct {
 
 // https://github.com/gqf2008/btwan/blob/master/cmd/migrate/migrate.go
 
-// New returns a new Cache that uses a bolt database at the given path.
-func New(config *Config) (*Cache, error) {
+// New returns a new Store that uses a bolt database at the given path.
+func New(config *Config) (*Store, error) {
 
 	if config.Debug {
 		log.WithFields(log.Fields{
 			"config": config,
-		}).Warnf("bboltcache.New()")
+		}).Warnf("bboltstore.New()")
 	}
 
 	if config == nil {
@@ -87,81 +70,67 @@ func New(config *Config) (*Cache, error) {
 	if config.Debug {
 		log.WithFields(log.Fields{
 			"config": config,
-		}).Warnf("bboltcache.New() ---> post-processed")
+		}).Warnf("bboltstore.New() ---> post-processed")
 	}
 
 	var err error
-	cache := &Cache{}
-	cache.storagePath = config.StoragePath
-	cache.bucketName = config.BucketName
-	cache.compress = config.Compress
-	cache.debug = config.Debug
-	cache.stats = config.Stats
+	store := &Store{}
+	store.storagePath = config.StoragePath
+	store.bucketName = config.BucketName
+	store.compress = config.Compress
+	store.debug = config.Debug
+	store.stats = config.Stats
 
-	cache.db, err = bolt.Open(config.StoragePath, 0755, nil)
+	store.db, err = bbolt.Open(config.StoragePath, 0755, nil)
 	if err != nil {
 		if config.Debug {
 			log.WithFields(log.Fields{
 				"config": config,
-				"cache":  cache,
-			}).Fatalf("bboltcache.New(): Open error: %v", err)
+				"store":  store,
+			}).Fatalf("bboltstore.New(): Open error: %v", err)
 		}
 		return nil, err
 	}
 
-	init := func(tx *bolt.Tx) error {
+	init := func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists([]byte(config.BucketName))
-		if cache.stats {
+		if store.stats {
 			log.Printf("Connected to DB(%s) : %+v", config.BucketName, bucket.Stats())
 		}
 		return err
 	}
 
-	if err := cache.db.Update(init); err != nil {
-		if config.Debug {
-			log.Fatalf("bboltcache.New(): init error: %v", err)
+	if err := store.db.Update(init); err != nil {
+		// return nil, err
+		if err := store.db.Close(); err != nil {
+			return nil, err
 		}
-		if err := cache.db.Close(); err != nil {
-			if config.Debug {
-				log.Fatalf("bboltcache.New(): close error: %v", err)
-			}
-		}
-		return nil, err
 	}
-	return cache, nil
+	return store, nil
 }
 
-// Mount returns a new Cache using the provided (and opened) bolt database.
-func Mount(db *bolt.DB) *Cache {
-	return &Cache{db: db}
+// Mount returns a new Store using the provided (and opened) bolt database.
+func Mount(db *bbolt.DB) *Store {
+	return &Store{db: db}
 }
 
 // Close closes the underlying boltdb database.
-func (c *Cache) Close() error {
-	if c.debug {
-		log.WithFields(log.Fields{
-			"bucketName": c.bucketName,
-		}).Warnf("bboltcache.Close()")
-	}
+func (c *Store) Close() error {
 	return c.db.Close()
 }
 
 // Get retrieves the response corresponding to the given key if present.
-func (c *Cache) Get(key string) (resp []byte, ok bool) {
+func (c *Store) Get(key string) (resp []byte, ok bool) {
 	c.RLock()
-	get := func(tx *bolt.Tx) error {
+	get := func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte(c.bucketName))
 		if bkt == nil {
 			return errors.New("bucket is nil")
-		}
-		if c.stats {
-			log.Printf("Connected to DB(%s) : %+v", c.bucketName, bkt.Stats())
 		}
 		resp = bkt.Get([]byte(key))
 		return nil
 	}
 	if err := c.db.View(get); err != nil {
-		log.Printf("boltdbcache.Get(): view error: %v", err)
 		return resp, false
 	}
 	c.RUnlock()
@@ -175,16 +144,13 @@ func (c *Cache) Get(key string) (resp []byte, ok bool) {
 	return resp, resp != nil
 }
 
-// Set stores a response to the cache at the given key.
-func (c *Cache) Set(key string, resp []byte) {
+// Set stores a response to the store at the given key.
+func (c *Store) Set(key string, resp []byte) error {
 	c.Lock()
-	set := func(tx *bolt.Tx) error {
+	set := func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte(c.bucketName))
 		if bkt == nil {
 			return errors.New("bucket is nil")
-		}
-		if c.stats {
-			log.Printf("Connected to DB(%s) : %+v", c.bucketName, bkt.Stats())
 		}
 		if c.compress {
 			var err error
@@ -197,54 +163,26 @@ func (c *Cache) Set(key string, resp []byte) {
 	}
 	c.Unlock()
 	if err := c.db.Update(set); err != nil {
-		log.Printf("boltdbcache.Set(): update error: %v", err)
+		return err
 	}
+	return nil
 }
 
-// Delete removes the response with the given key from the cache.
-func (c *Cache) Delete(key string) {
+// Delete removes the response with the given key from the store.
+func (c *Store) Delete(key string) error {
 	c.Lock()
-	del := func(tx *bolt.Tx) error {
+	del := func(tx *bbolt.Tx) error {
 		bkt := tx.Bucket([]byte(c.bucketName))
 		if bkt == nil {
-			if c.debug {
-				log.WithFields(log.Fields{
-					"context":    "Bucket",
-					"bucketName": c.bucketName,
-					"key":        key,
-				}).Fatal("bboltcache.Delete() Bucket error")
-			}
-			return errors.New(fmt.Sprintf("bboltcache.Delete(): could not reach the bucket: %s", c.bucketName))
-		}
-		if c.stats {
-			log.Printf("Connected to DB(%s) : %+v", c.bucketName, bkt.Stats())
+			return errors.New(fmt.Sprintf("bboltstore.Delete(): could not reach the bucket: %s", c.bucketName))
 		}
 		return bkt.Delete([]byte(key))
 	}
 	if err := c.db.Update(del); err != nil {
-		if c.debug {
-			log.WithFields(log.Fields{
-				"context":    "Delete",
-				"bucketName": c.bucketName,
-				"key":        key,
-			}).Fatalln("bboltcache.Delete() Update: ", err)
-		}
-		return
+		return err
 	}
 	c.Unlock()
-	if c.debug {
-		log.WithFields(log.Fields{
-			"context":    "Update",
-			"bucketName": c.bucketName,
-			"key":        key,
-		}).Info("bboltcache.Delete() OK")
-	}
-}
-
-func (c *Cache) Debug(action string) {}
-
-func (c *Cache) Action(name string, args ...interface{}) (map[string]*interface{}, error) {
-	return nil, errors.New("Action not implemented yet")
+	return nil
 }
 
 func ungzipData(data []byte) ([]byte, error) {

@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	// external
 	"github.com/pierrec/lz4"
 )
 

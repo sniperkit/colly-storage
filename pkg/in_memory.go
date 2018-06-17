@@ -1,36 +1,59 @@
 package storage
 
 import (
+	"errors"
 	"sync"
-
-	"net/http/cookiejar"
 )
 
-// InMemoryStorage is the default storage backend of colly.
-// InMemoryStorage keeps cookies and visited urls in memory
-// without persisting data on the disk.
+// InMemoryStorage is the default storage backend of storage interface.
 type InMemoryStorage struct {
-	visitedURLs map[uint64]bool
-	lock        *sync.RWMutex
-	jar         *cookiejar.Jar
+	lock *sync.RWMutex
+	// visitedURLs map[uint64]bool
+	// jar         *cookiejar.Jar
+}
+
+type InMemoryConfig struct {
+	MaxRow int
 }
 
 // Init initializes InMemoryStorage
 func (s *InMemoryStorage) Init() error {
-	if s.visitedURLs == nil {
-		s.visitedURLs = make(map[uint64]bool)
-	}
-	if s.lock == nil {
-		s.lock = &sync.RWMutex{}
-	}
-	if s.jar == nil {
-		var err error
-		s.jar, err = cookiejar.New(nil)
-		return err
-	}
+	return errors.New("Init method is not implemented yet...")
+}
+
+func (s *InMemoryStorage) Get(key string) (resp []byte, ok bool) {
+	return []byte{}, false
+}
+
+func (s *InMemoryStorage) Set(key string, resp []byte) error {
+	return errors.New("Set() method is not implemented yet")
+}
+
+func (s *InMemoryStorage) Delete(key string) error {
+	return errors.New("Delete() method is not implemented yet")
+}
+
+// Debug
+func (s *InMemoryStorage) Debug(action string) error {
+	return errors.New("Debug() method is not implemented yet")
+}
+
+// Ping check if the storage is available...
+func (s *InMemoryStorage) Ping() error {
+	return errors.New("Ping() method is not implemented yet")
+}
+
+// Clear truncate all key/values stored...
+func (s *InMemoryStorage) Clear() error {
+	return errors.New("Debug is not implemented yet")
+}
+
+// Close deletes the storage
+func (s *InMemoryStorage) Close() error {
 	return nil
 }
 
+/*
 // Visited implements Storage.Visited()
 func (s *InMemoryStorage) Visited(requestID uint64) error {
 	s.lock.Lock()
@@ -56,8 +79,4 @@ func (s *InMemoryStorage) Cookies(u *url.URL) string {
 func (s *InMemoryStorage) SetCookies(u *url.URL, cookies string) {
 	s.jar.SetCookies(u, UnstringifyCookies(cookies))
 }
-
-// Close implements Storage.Close()
-func (s *InMemoryStorage) Close() error {
-	return nil
-}
+*/

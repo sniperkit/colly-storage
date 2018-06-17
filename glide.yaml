@@ -1,0 +1,33 @@
+package: github.com/sniperkit/colly-storage
+ignore:
+- gob
+- github.com/sniperkit/colly-storage/plugin/backend/.staging
+import:
+- package: github.com/boltdb/bolt
+- package: github.com/dgraph-io/badger
+- package: github.com/go-redis/redis
+- package: github.com/golang/snappy
+- package: github.com/hashicorp/go-msgpack
+  subpackages:
+  - codec
+- package: github.com/imdario/mergo
+- package: github.com/json-iterator/go
+- package: github.com/mattn/go-sqlite3
+- package: github.com/opennota/substring
+- package: github.com/rai-project/linguist
+- package: github.com/sniperkit/pp
+- package: github.com/tidwall/match
+- package: github.com/wttw/orderedheaders
+- package: gopkg.in/kothar/brotli-go.v0
+  subpackages:
+  - enc
+- package: gopkg.in/src-d/enry.v1
+- package: gopkg.in/yaml.v2
+- package: github.com/lestrrat/go-file-rotatelogs
+  version: master
+testImport:
+- package: github.com/onsi/ginkgo
+- package: github.com/onsi/gomega
+- package: github.com/pierrec/lz4
+- package: github.com/rohanthewiz/logger
+- package: github.com/rohanthewiz/serr

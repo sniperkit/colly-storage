@@ -14,59 +14,46 @@
 
 package storage
 
-import (
-	"net/http"
-	"net/http/cookiejar"
-	"net/url"
-	"strings"
-	"sync"
-)
-
-// Storage is an interface which handles Collector's internal data,
-// like visited urls and cookies.
-// The default Storage of the Collector is the InMemoryStorage.
-// Collector's storage can be changed by calling Collector.SetStorage()
-// function.
+// Storage is an interface which handles...
 type Storage interface {
-	// Init initializes the storage
+	// Init initializes the storage instance
 	Init() error
-	// Visited receives and stores a request ID that is visited by the Collector
-	Visited(requestID uint64) error
-	// IsVisited returns true if the request was visited before IsVisited
-	// is called
-	IsVisited(requestID uint64) (bool, error)
-	// Cookies retrieves stored cookies for a given host
-	Cookies(u *url.URL) string
-	// SetCookies stores cookies for a given host
-	SetCookies(u *url.URL, cookies string)
+	// Get returns the []byte representation of an entry and a bool set to true if the value isn't empty
+	Get(key string) (responseBytes []byte, ok bool)
+	// Set stores the []byte representation of  an entry against a key
+	Set(key string, responseBytes []byte) error
+	// Delete removes the entry value associated with the key
+	Delete(key string) error
+	// Debug
+	Debug(action string) error
+	// Clear
+	Clear() error
+	//  Action
+	Action(name string, args ...interface{}) (map[string]*interface{}, error)
 }
 
-// StringifyCookies serializes list of http.Cookies to string
-func StringifyCookies(cookies []*http.Cookie) string {
-	// Stringify cookies.
-	cs := make([]string, len(cookies))
-	for i, c := range cookies {
-		cs[i] = c.String()
+// Visited receives and stores a request ID that is visited by the Collector
+// Visited(requestID uint64) error
+// IsVisited returns true if the request was visited before IsVisited
+// is called
+// IsVisited(requestID uint64) (bool, error)
+// Cookies retrieves stored cookies for a given host
+// Cookies(u *url.URL) string
+// SetCookies stores cookies for a given host
+// SetCookies(u *url.URL, cookies string)
+
+// Get returns the stored entry if present, and nil otherwise.
+func Get(s Storage, query string) (output []byte, err error) {
+	outputStr, ok := s.Get(storageQuery(query))
+	if !ok {
+		return []byte{}, nil
 	}
-	return strings.Join(cs, "\n")
+	return output, err
+	// b := bytes.NewBuffer(outputStr)
+	// return http.ReadResponse(bufio.NewReader(b), req)
 }
 
-// UnstringifyCookies deserializes a cookie string to http.Cookies
-func UnstringifyCookies(s string) []*http.Cookie {
-	h := http.Header{}
-	for _, c := range strings.Split(s, "\n") {
-		h.Add("Set-Cookie", c)
-	}
-	r := http.Response{Header: h}
-	return r.Cookies()
-}
-
-// ContainsCookie checks if a cookie name is represented in cookies
-func ContainsCookie(cookies []*http.Cookie, name string) bool {
-	for _, c := range cookies {
-		if c.Name == name {
-			return true
-		}
-	}
-	return false
+// storageQuery returns the entry for the query.
+func storageQuery(query string) string {
+	return ""
 }
