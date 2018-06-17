@@ -5,7 +5,7 @@ import (
 	"os"
 
 	// external
-	pp "github.com/sniperkit/pp"
+	pp "github.com/k0kubun/pp"
 
 	// internal
 	storage "github.com/sniperkit/colly-storage/pkg"

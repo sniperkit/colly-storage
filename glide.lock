@@ -1,10 +1,12 @@
-hash: e607a036dd6c57c4f5dc10624eaa1ca3a30d5a01e54d556f0225967c2396e0f8
-updated: 2018-06-17T14:52:49.404143222+02:00
+hash: ef8d8d4cd718865c693d19b17305211ab10fd1085e7d2e2dd98ce9b8cc7d08ad
+updated: 2018-06-17T17:20:49.300974846+02:00
 imports:
 - name: github.com/AndreasBriese/bbloom
   version: 28f7e881ca57bc00e028f9ede9f0d9104cfeef5e
 - name: github.com/boltdb/bolt
   version: 9da31745363232bc1e27dbab3569e77383a51585
+- name: github.com/coreos/bbolt
+  version: af9db2027c98c61ecd8e17caa5bd265792b9b9a2
 - name: github.com/daaku/go.zipexe
   version: a5fe2436ffcb3236e175e5149162b41cd28bd27d
 - name: github.com/dgraph-io/badger
@@ -43,14 +45,16 @@ imports:
   - codec
 - name: github.com/imdario/mergo
   version: 7fe0c75c13abdee74b09fcacef5ea1c6bba6a874
-- name: github.com/jbrukh/bayesian
-  version: 2177c82d4d5a30402758106ccc425c8be57c0181
 - name: github.com/json-iterator/go
   version: 8744d7c5c7b40a53e018f78d8c508b3315260b96
+- name: github.com/k0kubun/pp
+  version: e057ee7a28277be4d2af303443b6da377768181f
 - name: github.com/kardianos/osext
   version: ae77be60afb1dcacde03767a8c37337fad28ac14
-- name: github.com/lestrrat/go-file-rotatelogs
-  version: d3151e2a480fdcd05fb97102f5310a47d96274c4
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/mattn/go-sqlite3
   version: 8897bf145272af4dd0305518cfb725a5b6d0541c
 - name: github.com/modern-go/concurrent
@@ -67,8 +71,6 @@ imports:
   - pkg
   - pkg/data
   - pkg/tokenizer
-- name: github.com/sniperkit/pp
-  version: 29ec8d8c06c330e43451fb113d687d3def6ffd81
 - name: github.com/tidwall/match
   version: 1731857f09b1f38450e2c12409748407822dc6be
 - name: github.com/toqueteos/trie
@@ -104,6 +106,8 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
 testImports:
+- name: github.com/lestrrat/go-file-rotatelogs
+  version: ""
 - name: github.com/lestrrat/go-strftime
   version: ba3bf9c1d0421aa146564a632931730344f1f9f1
 - name: github.com/onsi/ginkgo

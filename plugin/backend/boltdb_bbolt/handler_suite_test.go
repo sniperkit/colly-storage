@@ -1,4 +1,4 @@
-package boltdbstorage
+package bboltstorage
 
 import (
 	"testing"
