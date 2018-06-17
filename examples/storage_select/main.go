@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	backendName       string = "boltdb" // use a flag to switch between backends
+	backendName       string = "bbolt" // use a flag to switch between backends
 	backendDefault    string = "in_memory"
 	storagePrefixPath string = "./shared/"
 )
@@ -37,31 +37,43 @@ func main() {
 
 	switch backendName {
 	case "badger":
+		// conf
 		conf := &bck_badger.Config{
 			ValueDir:    "colly-storage.snappy",
-			StoragePath: filepath.Join(storagePrefixPath, "badger"),
+			StoragePath: filepath.Join(storagePrefixPath, "storage", "badger"),
 			SyncWrites:  false,
 			Debug:       false,
 			Compress:    true,
 			TTL:         time.Duration(120 * 24 * time.Hour),
 		}
+		// init
 		store, err = bck_badger.New(conf)
 
 	case "boltdb":
+		// conf
+		bucketName := "colly-storage"
+		bucketPrefixPath := filepath.Join(storagePrefixPath, "storage", "boltdb")
+		bucketStorageFilePath := fmt.Sprintf("%s/%s/%s%s", bucketPrefixPath, bucketName, bucketName, bck_boltdb.StorageFileExtension)
 		conf := &bck_boltdb.Config{
 			BucketName:  "colly-storage.boltdb",
-			StoragePath: filepath.Join(storagePrefixPath, "boltdb"),
+			StoragePath: bucketStorageFilePath,
 			Debug:       false,
 		}
+		// init
 		store, err = bck_boltdb.New(conf)
 
 	case "bbolt":
+		// conf
+		bucketName := "colly-storage"
+		bucketPrefixPath := filepath.Join(storagePrefixPath, "storage", "bbolt")
+		bucketStorageFilePath := fmt.Sprintf("%s/%s/%s%s", bucketPrefixPath, bucketName, bucketName, bck_bboltdb.StorageFileExtension)
 		conf := &bck_bboltdb.Config{
 			BucketName:  "colly-storage.bbolt",
-			StoragePath: filepath.Join(storagePrefixPath, "bbolt"),
+			StoragePath: bucketStorageFilePath,
 			Debug:       false,
 			Stats:       false,
 		}
+		// init
 		store, err = bck_bboltdb.New(conf)
 
 	case "diskv":

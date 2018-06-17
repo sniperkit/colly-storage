@@ -18,8 +18,8 @@ import (
 )
 
 var (
-	defaultStorageDir  string = filepath.Join(storagePrefixPath, storageBucketName)
-	defaultStorageFile string = fmt.Sprintf("%s/%s%s", storagePrefixPath, storageBucketName, storageFileExtension)
+	DefaultStorageDir  string = filepath.Join(StoragePrefixPath, StorageBucketName)
+	DefaultStorageFile string = fmt.Sprintf("%s/%s%s", StoragePrefixPath, StorageBucketName, StorageFileExtension)
 )
 
 // Store is an implementation of httpstore.Store that uses a bolt database.
@@ -50,16 +50,16 @@ type Check struct {
 func New(config *Config) (*Store, error) {
 
 	if config == nil {
-		config.StoragePath = defaultStorageFile
-		config.BucketName = storageBucketName
+		config.StoragePath = DefaultStorageFile
+		config.BucketName = StorageBucketName
 	}
 
 	if config.StoragePath == "" {
-		config.StoragePath = defaultStorageFile
+		config.StoragePath = DefaultStorageFile
 	}
 
 	if config.BucketName == "" {
-		config.BucketName = storageBucketName
+		config.BucketName = StorageBucketName
 	}
 
 	var err error
@@ -73,7 +73,7 @@ func New(config *Config) (*Store, error) {
 	if err := helper.EnsurePathExists(config.StoragePath); err != nil {
 		return nil, err
 	} else {
-		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, storageBucketName, storageFileExtension)
+		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, StorageBucketName, StorageFileExtension)
 	}
 
 	store.db, err = bbolt.Open(config.StoragePath, 0755, nil)

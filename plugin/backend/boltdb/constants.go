@@ -1,7 +1,7 @@
 package boltdbstorage
 
 const (
-	storageBucketName    string = "colly-storage"
-	storagePrefixPath    string = "./shared/data/storage/boltdb"
-	storageFileExtension string = ".boltdb"
+	StorageBucketName    string = "colly-storage"
+	StoragePrefixPath    string = "./shared/data/storage/boltdb"
+	StorageFileExtension string = ".boltdb"
 )

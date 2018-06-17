@@ -14,8 +14,7 @@ import (
 )
 
 var (
-	// storagePrefixPath  string = filepath.Join(storagePrefixPath, storageBucketName)
-	defaultStorageFile string = fmt.Sprintf("%s/%s/%s%s", storagePrefixPath, storageBucketName, storageBucketName, storageFileExtension)
+	DefaultStorageFile string = fmt.Sprintf("%s/%s/%s%s", StoragePrefixPath, StorageBucketName, StorageBucketName, StorageFileExtension)
 )
 
 type Store struct {
@@ -29,13 +28,13 @@ type Store struct {
 
 func New(config *Config) (*Store, error) {
 	if config == nil {
-		config.StoragePath = defaultStorageFile
+		config.StoragePath = DefaultStorageFile
 	}
 	if config.StoragePath == "" {
 		return nil, errors.New("boltdbstore.New(): Storage path is not defined.")
 	}
 	if config.BucketName == "" {
-		config.BucketName = storageBucketName
+		config.BucketName = StorageBucketName
 	}
 
 	store := &Store{}
@@ -44,7 +43,7 @@ func New(config *Config) (*Store, error) {
 	if err := helper.EnsurePathExists(config.StoragePath); err != nil {
 		return nil, err
 	} else {
-		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, storageBucketName, storageFileExtension)
+		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, StorageBucketName, StorageFileExtension)
 	}
 
 	var err error
