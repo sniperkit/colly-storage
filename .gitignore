@@ -17,3 +17,5 @@ vendor/*
 vendor/**
 
 .staging
+.next
+.todo
