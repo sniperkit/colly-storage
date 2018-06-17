@@ -74,31 +74,3 @@ func (s *Store) Clear() error {
 func (s *Store) Close() error {
 	return nil
 }
-
-/*
-// Visited implements Storage.Visited()
-func (s *Store) Visited(requestID uint64) error {
-	s.lock.Lock()
-	s.visitedURLs[requestID] = true
-	s.lock.Unlock()
-	return nil
-}
-
-// IsVisited implements Storage.IsVisited()
-func (s *Store) IsVisited(requestID uint64) (bool, error) {
-	s.lock.RLock()
-	visited := s.visitedURLs[requestID]
-	s.lock.RUnlock()
-	return visited, nil
-}
-
-// Cookies implements Storage.Cookies()
-func (s *Store) Cookies(u *url.URL) string {
-	return StringifyCookies(s.jar.Cookies(u))
-}
-
-// SetCookies implements Storage.SetCookies()
-func (s *Store) SetCookies(u *url.URL, cookies string) {
-	s.jar.SetCookies(u, UnstringifyCookies(cookies))
-}
-*/

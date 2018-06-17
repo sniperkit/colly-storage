@@ -22,12 +22,45 @@ type Config struct {
 	Stats          bool
 }
 
+// DefaultConfig returns the default configuration for this serializer
+func DefaultConfig() Config {
+	return Config{
+		Sanitize: false,
+	}
+}
+
+// ConfigName ...
+func (Config) ConfigName() string {
+	return "BBoltDB"
+}
+
+// Merge merges the default with the given config and returns the result
+func (c Config) Merge(cfg []Config) (config Config) {
+	if len(cfg) > 0 {
+		config = cfg[0]
+		mergo.Merge(&config, c)
+	} else {
+		_default := c
+		config = _default
+	}
+	return
+}
+
+// MergeSingle merges the default with the given config and returns the result
+func (c Config) MergeSingle(cfg Config) (config Config) {
+	config = cfg
+	mergo.Merge(&config, c)
+	return
+}
+
+/*
 // storageConfig is...
 type storageConfig struct {
 	Provider       string        `json:"provider" yaml:"provider" config:"store.http.provider"`
 	MaxConnections int           `json:"max_connections" yaml:"max_connections" config:"store.http.max_connections" default:"0"`
 	BucketName     string        `json:"bucket_name" yaml:"bucket_name" config:"store.http.provider"`
 	StoragePath    string        `json:"storage_path" yaml:"storage_path" config:"store.http.storage_path"`
+	EnableGzip     bool          `json:"enable_gzip" yaml:"enable_gzip" config:"store.http.enable_gzip"`
 	ReadOnly       bool          `json:"read_only" yaml:"read_only" config:"store.http.read_only"`
 	StrictMode     bool          `json:"strict_mode" yaml:"strict_mode" config:"store.http.strict_mode"`
 	NoSync         bool          `json:"no_sync" yaml:"no_sync" config:"store.http.no_sync"`
@@ -39,32 +72,8 @@ type storageConfig struct {
 	done           chan struct{} `json:"-" yaml:"-" toml:"-" xml:"-" config:"-"`
 }
 
-// DefaultConfig returns the default configuration for this serializer
-func DefaultConfig() Config {
-	return Config{
-		Sanitize: false,
-	}
+// Wait ...
+func (c storageConfig) Wait() {
+	<-c.done
 }
-
-// Merge merges the default with the given config and returns the result
-func (c Config) Merge(cfg []Config) (config Config) {
-
-	if len(cfg) > 0 {
-		config = cfg[0]
-		mergo.Merge(&config, c)
-	} else {
-		_default := c
-		config = _default
-	}
-
-	return
-}
-
-// MergeSingle merges the default with the given config and returns the result
-func (c Config) MergeSingle(cfg Config) (config Config) {
-
-	config = cfg
-	mergo.Merge(&config, c)
-
-	return
-}
+*/

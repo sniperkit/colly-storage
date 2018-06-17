@@ -8,7 +8,10 @@ ignore:
 - github.com/sniperkit/colly-request
 - github.com/sniperkit/codecs
 - github.com/sniperkit/pp
+- github.com/mattn/go-sqlite3
+- github.com/rohanthewiz/serr
 import:
+- package: github.com/hashicorp/errwrap
 - package: github.com/golang/protobuf
   repo: https://github.com/golang/protobuf.git
   vcs: git
@@ -18,29 +21,26 @@ import:
   - ptypes/any
   - proto 
   - protoc-gen-go
+- package: github.com/lestrrat/go-file-rotatelogs
+  version: master
 - package: github.com/boltdb/bolt
 - package: github.com/coreos/bbolt
 - package: github.com/dgraph-io/badger
-- package: github.com/go-redis/redis
+- package: github.com/ghetzel/pivot
+  subpackages:
+  - backends
+  - dal
+  - mapper
 - package: github.com/golang/snappy
 - package: github.com/hashicorp/go-msgpack
   subpackages:
   - codec
 - package: github.com/imdario/mergo
-- package: github.com/json-iterator/go
 - package: github.com/k0kubun/pp
-- package: github.com/mattn/go-sqlite3
-- package: github.com/opennota/substring
-- package: github.com/rai-project/linguist
-- package: github.com/tidwall/match
-- package: github.com/wttw/orderedheaders
-- package: github.com/lestrrat/go-file-rotatelogs
-  version: master
+- package: github.com/rohanthewiz/roencoding
 - package: gopkg.in/kothar/brotli-go.v0
   subpackages:
   - enc
-- package: gopkg.in/src-d/enry.v1
-- package: gopkg.in/yaml.v2
 testImport:
 - package: github.com/onsi/ginkgo
 - package: github.com/onsi/gomega

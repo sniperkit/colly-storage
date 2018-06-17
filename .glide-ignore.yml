@@ -1,0 +1,10 @@
+ignore:
+- gob
+- github.com/jbrukh/bayesian
+- github.com/sniperkit/colly-storage/plugin/backend/.staging
+- github.com/sniperkit/colly
+- github.com/sniperkit/colly-header
+- github.com/sniperkit/colly-request
+- github.com/sniperkit/codecs
+- github.com/sniperkit/pp
+- github.com/mattn/go-sqlite3
