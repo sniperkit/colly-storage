@@ -1,17 +1,13 @@
 package badgerstorage
 
 import (
+	"time"
+
 	"github.com/imdario/mergo"
 )
 
 // Config is the configuration for this serializer
 type Config struct {
-	Debug bool
-
-	Sanitize bool
-
-	Compress bool
-
 	// 1. Mandatory flags
 	// -------------------
 	// Directory to store the data in. Should exist and be writable.
@@ -57,10 +53,26 @@ type Config struct {
 	// Number of compaction workers to run concurrently.
 	NumCompactors int
 
-	// 4. Flags for testing purposes
+	// 4. Flags for dev purposes
+	// ------------------------------
+	//
+	UseTTL bool
+
+	//
+	TTL time.Duration
+
+	// 5. Flags for testing purposes
 	// ------------------------------
 	DoNotCompact bool // Stops LSM tree from compactions.
 
+	// Debug sets...
+	Debug bool
+
+	// Sanitize sets...
+	Sanitize bool
+
+	// Compress sets...
+	Compress bool
 }
 
 // storageConfig is...
@@ -105,9 +117,7 @@ func (c Config) Merge(cfg []Config) (config Config) {
 
 // MergeSingle merges the default with the given config and returns the result
 func (c Config) MergeSingle(cfg Config) (config Config) {
-
 	config = cfg
 	mergo.Merge(&config, c)
-
 	return
 }

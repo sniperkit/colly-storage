@@ -1,6 +1,7 @@
 // +build detect
 package badgerstorage
 
+/*
 import (
 	"bufio"
 	"net/textproto"
@@ -153,3 +154,4 @@ func IsLZH(b []byte) bool {
 	}
 	return false
 }
+*/

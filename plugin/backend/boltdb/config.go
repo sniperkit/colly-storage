@@ -34,7 +34,7 @@ type storageConfig struct {
 func DefaultConfig() Config {
 	return Config{
 		Sanitize:    false,
-		StoragePath: defaultCacheDir,
+		StoragePath: defaultStorageFile,
 		BucketName:  storageBucketName,
 	}
 }

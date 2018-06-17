@@ -48,7 +48,7 @@ func Get(s Storage, query string) (output []byte, err error) {
 	if !ok {
 		return []byte{}, nil
 	}
-	return output, err
+	return outputStr, err
 	// b := bytes.NewBuffer(outputStr)
 	// return http.ReadResponse(bufio.NewReader(b), req)
 }

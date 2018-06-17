@@ -1,5 +1,5 @@
-hash: ef8d8d4cd718865c693d19b17305211ab10fd1085e7d2e2dd98ce9b8cc7d08ad
-updated: 2018-06-17T17:20:49.300974846+02:00
+hash: 9009684e0008593a38f03c0e29aba29a01b076058e9e4668f4c90f1e5284de04
+updated: 2018-06-17T17:34:00.521485033+02:00
 imports:
 - name: github.com/AndreasBriese/bbloom
   version: 28f7e881ca57bc00e028f9ede9f0d9104cfeef5e
@@ -34,9 +34,14 @@ imports:
   - internal/singleflight
   - internal/util
 - name: github.com/golang/protobuf
-  version: 655cdfa588ea190e901bc5590e65d5621688847c
+  version: 9f81198da99b79e14d70ca2c3cc1bbe44c6e69b6
+  repo: https://github.com/golang/protobuf.git
+  vcs: git
   subpackages:
   - proto
+  - protoc-gen-go
+  - ptypes
+  - ptypes/any
 - name: github.com/golang/snappy
   version: cef980a12b316c5b7e5bb3a8e168eb43ae999a88
 - name: github.com/hashicorp/go-msgpack
@@ -51,6 +56,8 @@ imports:
   version: e057ee7a28277be4d2af303443b6da377768181f
 - name: github.com/kardianos/osext
   version: ae77be60afb1dcacde03767a8c37337fad28ac14
+- name: github.com/lestrrat/go-file-rotatelogs
+  version: d3151e2a480fdcd05fb97102f5310a47d96274c4
 - name: github.com/mattn/go-colorable
   version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
 - name: github.com/mattn/go-isatty
@@ -106,8 +113,6 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
 testImports:
-- name: github.com/lestrrat/go-file-rotatelogs
-  version: ""
 - name: github.com/lestrrat/go-strftime
   version: ba3bf9c1d0421aa146564a632931730344f1f9f1
 - name: github.com/onsi/ginkgo

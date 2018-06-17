@@ -2,26 +2,34 @@ package boltdbstorage
 
 import (
 	"errors"
-	"path/filepath"
+	// "path/filepath"
+	"fmt"
 	"sync"
 
 	// external
 	"github.com/boltdb/bolt"
+
+	// internal
+	helper "github.com/sniperkit/colly-storage/pkg/helper"
 )
 
-var defaultCacheDir string = filepath.Join(storagePrefixPath, storageBucketName)
+var (
+	// storagePrefixPath  string = filepath.Join(storagePrefixPath, storageBucketName)
+	defaultStorageFile string = fmt.Sprintf("%s/%s/%s%s", storagePrefixPath, storageBucketName, storageBucketName, storageFileExtension)
+)
 
 type Store struct {
-	syns.RWMutex
+	sync.RWMutex
 	db          *bolt.DB
 	storagePath string
 	bucketName  string
+	fp          string
 	debug       bool
 }
 
 func New(config *Config) (*Store, error) {
 	if config == nil {
-		config.StoragePath = defaultCacheDir
+		config.StoragePath = defaultStorageFile
 	}
 	if config.StoragePath == "" {
 		return nil, errors.New("boltdbstore.New(): Storage path is not defined.")
@@ -32,6 +40,12 @@ func New(config *Config) (*Store, error) {
 
 	store := &Store{}
 	store.debug = config.Debug
+
+	if err := helper.EnsurePathExists(config.StoragePath); err != nil {
+		return nil, err
+	} else {
+		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, storageBucketName, storageFileExtension)
+	}
 
 	var err error
 	store.db, err = bolt.Open(config.StoragePath, 0600, nil)

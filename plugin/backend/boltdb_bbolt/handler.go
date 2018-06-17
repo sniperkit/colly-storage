@@ -12,6 +12,9 @@ import (
 
 	// external
 	bbolt "github.com/coreos/bbolt"
+
+	// internal
+	helper "github.com/sniperkit/colly-storage/pkg/helper"
 )
 
 var (
@@ -26,6 +29,7 @@ type Store struct {
 	db          *bbolt.DB
 	storagePath string
 	bucketName  string
+	fp          string
 	debug       bool
 	stats       bool
 	compress    bool
@@ -42,21 +46,12 @@ type Check struct {
 	Provider  string
 }
 
-// https://github.com/gqf2008/btwan/blob/master/cmd/migrate/migrate.go
-
 // New returns a new Store that uses a bolt database at the given path.
 func New(config *Config) (*Store, error) {
 
-	if config.Debug {
-		log.WithFields(log.Fields{
-			"config": config,
-		}).Warnf("bboltstore.New()")
-	}
-
 	if config == nil {
-		log.Warnln("config is nil")
 		config.StoragePath = defaultStorageFile
-		config.BucketName = bktName
+		config.BucketName = storageBucketName
 	}
 
 	if config.StoragePath == "" {
@@ -64,13 +59,7 @@ func New(config *Config) (*Store, error) {
 	}
 
 	if config.BucketName == "" {
-		config.BucketName = bktName
-	}
-
-	if config.Debug {
-		log.WithFields(log.Fields{
-			"config": config,
-		}).Warnf("bboltstore.New() ---> post-processed")
+		config.BucketName = storageBucketName
 	}
 
 	var err error
@@ -81,27 +70,24 @@ func New(config *Config) (*Store, error) {
 	store.debug = config.Debug
 	store.stats = config.Stats
 
+	if err := helper.EnsurePathExists(config.StoragePath); err != nil {
+		return nil, err
+	} else {
+		store.fp = fmt.Sprintf("%s/%s%s", config.StoragePath, storageBucketName, storageFileExtension)
+	}
+
 	store.db, err = bbolt.Open(config.StoragePath, 0755, nil)
 	if err != nil {
-		if config.Debug {
-			log.WithFields(log.Fields{
-				"config": config,
-				"store":  store,
-			}).Fatalf("bboltstore.New(): Open error: %v", err)
-		}
 		return nil, err
 	}
 
 	init := func(tx *bbolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(config.BucketName))
-		if store.stats {
-			log.Printf("Connected to DB(%s) : %+v", config.BucketName, bucket.Stats())
-		}
+		_, err := tx.CreateBucketIfNotExists([]byte(config.BucketName))
 		return err
 	}
 
 	if err := store.db.Update(init); err != nil {
-		// return nil, err
+		return nil, err
 		if err := store.db.Close(); err != nil {
 			return nil, err
 		}

@@ -9,6 +9,15 @@ ignore:
 - github.com/sniperkit/codecs
 - github.com/sniperkit/pp
 import:
+- package: github.com/golang/protobuf
+  repo: https://github.com/golang/protobuf.git
+  vcs: git
+  branch: master 
+  subpackages:
+  - ptypes
+  - ptypes/any
+  - proto 
+  - protoc-gen-go
 - package: github.com/boltdb/bolt
 - package: github.com/coreos/bbolt
 - package: github.com/dgraph-io/badger
