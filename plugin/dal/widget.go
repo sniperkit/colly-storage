@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"time"
+
 	"github.com/ghetzel/pivot/dal"
 	"github.com/ghetzel/pivot/mapper"
 )

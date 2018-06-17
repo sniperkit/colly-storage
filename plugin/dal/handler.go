@@ -1,25 +1,31 @@
 package dal
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 
+	// external
 	"github.com/ghetzel/pivot"
 	"github.com/ghetzel/pivot/backends"
 	"github.com/ghetzel/pivot/dal"
+	"github.com/ghetzel/pivot/mapper"
+
+	// internal
+	helper "github.com/sniperkit/colly-storage/pkg/helper"
 )
 
-type Storage struct {
-	lock   *sync.RWMutex
-	store  backends.Backend
-	schema []*dal.Collection
-}
+var (
 
-type Config struct {
-	DSN      string
-	ReadOnly bool
-	Compress bool
-	Debug    bool
-	Stats    bool
+	// sqlite:///./test.db
+	DefaultBackendDSN string = fmt.Sprintf(`sqlite:///%s/%s%s`, DefaultStoragePrefixPath, DefaultStorageDatabaseName, DefaultStorageFileExtension)
+)
+
+type Store struct {
+	lock    *sync.RWMutex
+	backend backends.Backend
+	mapper  mapper.Mapper
+	schema  []*dal.Collection
 }
 
 func NewDataAbstractionLayer(config *Config) (*Store, error) {
@@ -29,6 +35,12 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 
 	if config.DSN == "" {
 		config.DSN = DefaultBackendDSN
+	}
+
+	if config.PrefixPath != nil {
+		if err := helper.EnsurePathExists(*config.PrefixPath); err != nil {
+			return nil, err
+		}
 	}
 
 	// setup a new backend instance based on the supplied connection string
@@ -46,11 +58,6 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 	return s, nil
 }
 
-// Init initializes Store
-func (s *Store) Init() error {
-	return errors.New("Init method is not implemented yet...")
-}
-
 func (s *Store) Get(key string) (resp []byte, ok bool) {
 	return []byte{}, false
 }
@@ -63,39 +70,24 @@ func (s *Store) Delete(key string) error {
 	return errors.New("Delete() method is not implemented yet")
 }
 
-// Debug
-func (s *Store) Debug(action string) error {
-	return errors.New("Debug() method is not implemented yet")
-}
-
-func (c *Store) Action(name string, args ...interface{}) (map[string]*interface{}, error) {
-	return nil, errors.New("Action() method is not implemented yet")
-}
-
-// Ping check if the storage is available...
-func (s *Store) Ping() error {
-	return errors.New("Ping() method is not implemented yet")
-}
-
-// Clear truncate all key/values stored...
-func (s *Store) Clear() error {
-	return errors.New("Debug is not implemented yet")
-}
-
 // Close deletes the storage
 func (s *Store) Close() error {
 	return nil
 }
 
-func (s *Store) setModel(widgetsSchema *dal.Collection) (mapper.Mapper, error) {
+func (s *Store) setModel(widgetsSchema *dal.Collection) error {
+
 	// register models to this database backend
-	widgets = mapper.NewModel(s.backend, widgetsSchema)
+	widgets := mapper.NewModel(s.backend, widgetsSchema)
+
 	// create the model tables if they don't exist
 	if err := widgets.Migrate(); err != nil {
 		fmt.Printf("failed to create widget table: %v\n", err)
-		return nil, error
+		return err
 	}
-	return widgets, nil
+
+	s.mapper = widgets
+	return nil
 }
 
 /*

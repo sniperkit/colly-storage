@@ -13,9 +13,23 @@ import (
 )
 
 var (
-	backendEngine     string = "sqlite3" // use a flag to switch between backends
-	backendDefault    string = "sqlite3"
-	storagePrefixPath string = "./shared/"
+	storageBackendDSN string = bck_dal.DefaultBackendDSN
+	//
+	// Backend DSN
+	// ref. https://github.com/ghetzel/pivot/blob/master/backends/backends.go#L41
+	//
+	// sqlite3: 		`sqlite:///./tmp/db_test/test.db`
+	// mysql/mariadb: 	`mysql://test:test@db/test`
+	// dynamoDB: 		`dynamodb://test:test@db/test`
+	// postgres: 		`postgres://test:test@db/test`
+	// file:			`file://%s/`
+	// filesystem: 		`fs://%s/`
+	// filesystem+yaml: `fs+yaml://%s/`
+	// filesystem+json: `fs+json://%s/`
+	// tiedot: 			`tiedot://%s/`
+	// mongodb: 		`mongodb://localhost/test`
+	// elastic: 		`not ready yet`
+	storagePrefixPath string = bck_dal.DefaultStoragePrefixPath
 )
 
 func main() {
@@ -25,14 +39,13 @@ func main() {
 	var err error
 	var store storage.Storage
 
-	if backendEngine == "" {
-		backendEngine = backendDefault
-	}
-
-	fmt.Println("Starting storage, backendEngine=", backendEngine)
+	fmt.Println("Starting `colly-dal` storage, dsn=", storageBackendDSN, ", prefixPath", storagePrefixPath)
 	conf := &bck_dal.Config{
-		Engine: backendEngine,
-		DSN:    "./shared/storage/sqlite3/colly-dal.sqlite",
+		PrefixPath: &storageBackendDSN,
+		DSN:        storagePrefixPath,
+		Verbose:    true,
+		Debug:      false,
+		Sanitize:   false,
 	}
 	store, err = bck_dal.NewDataAbstractionLayer(conf)
 	if err != nil {

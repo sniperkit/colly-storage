@@ -1,5 +1,5 @@
-hash: 5f020aa75fad67469455d5470fa7d518d775e36cc8290d1925d26886ba5392b0
-updated: 2018-06-17T19:46:52.501516525+02:00
+hash: 83c493ca179a9a4c4705e5360774fb3ee5459345a1494e73ecaf8f4aa7b20a00
+updated: 2018-06-17T20:14:13.697121675+02:00
 imports:
 - name: github.com/alexcesaro/statsd
   version: 7fea3f0d2fab1ad973e641e51dba45443a311a90
@@ -103,7 +103,7 @@ imports:
   - regexp
   - utf8
 - name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
   subpackages:
   - spew
 - name: github.com/deckarep/golang-set

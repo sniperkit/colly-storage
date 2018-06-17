@@ -23,6 +23,8 @@ import:
   - protoc-gen-go
 - package: github.com/lestrrat/go-file-rotatelogs
   version: master
+- package: github.com/davecgh/go-spew
+  version: v1.1.0
 - package: github.com/boltdb/bolt
 - package: github.com/coreos/bbolt
 - package: github.com/dgraph-io/badger

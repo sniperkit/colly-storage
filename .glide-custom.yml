@@ -10,3 +10,5 @@
 - package: github.com/lestrrat/go-file-rotatelogs
   version: master
 - package: github.com/hashicorp/errwrap
+- package: github.com/davecgh/go-spew
+  version: v1.1.0
