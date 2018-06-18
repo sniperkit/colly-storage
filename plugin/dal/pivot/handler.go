@@ -1,4 +1,4 @@
-package dal
+package dal_pivot
 
 import (
 	"errors"
@@ -35,6 +35,10 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 
 	if config.DSN == "" {
 		config.DSN = DefaultBackendDSN
+	}
+
+	if config.PrefixPath == nil {
+		config.PrefixPath = *DefaultStoragePrefixPath
 	}
 
 	if config.PrefixPath != nil {

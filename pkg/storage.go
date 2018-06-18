@@ -32,6 +32,23 @@ type Storage interface {
 	Action(name string, args ...interface{}) (map[string]*interface{}, error)
 }
 
+/*
+type Store interface {
+	Put(key string, value []byte, options *WriteOptions) error
+	Get(key string) (*KVPair, error)
+	Delete(key string) error
+	Exists(key string) (bool, error)
+	Watch(key string, stopCh <-chan struct{}) (<-chan *KVPair, error)
+	WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*KVPair, error)
+	NewLock(key string, options *LockOptions) (Locker, error)
+	List(directory string) ([]*KVPair, error)
+	DeleteTree(directory string) error
+	AtomicPut(key string, value []byte, previous *KVPair, options *WriteOptions) (bool, *KVPair, error)
+	AtomicDelete(key string, previous *KVPair) (bool, error)
+	Close()
+}
+*/
+
 // Visited receives and stores a request ID that is visited by the Collector
 // Visited(requestID uint64) error
 // IsVisited returns true if the request was visited before IsVisited

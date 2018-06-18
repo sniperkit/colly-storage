@@ -1,4 +1,4 @@
-package dal
+package dal_raidb_raidb
 
 import (
 	"github.com/imdario/mergo"

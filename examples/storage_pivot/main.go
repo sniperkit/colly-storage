@@ -9,11 +9,11 @@ import (
 
 	// internal
 	storage "github.com/sniperkit/colly-storage/pkg"
-	bck_dal "github.com/sniperkit/colly-storage/plugin/dal"
+	dal_pivot "github.com/sniperkit/colly-storage/plugin/dal/pivot"
 )
 
 var (
-	storageBackendDSN string = bck_dal.DefaultBackendDSN
+	storageBackendDSN string = dal_pivot.DefaultBackendDSN
 	//
 	// Backend DSN
 	// ref. https://github.com/ghetzel/pivot/blob/master/backends/backends.go#L41
@@ -29,7 +29,7 @@ var (
 	// tiedot: 			`tiedot://%s/`
 	// mongodb: 		`mongodb://localhost/test`
 	// elastic: 		`not ready yet`
-	storagePrefixPath string = bck_dal.DefaultStoragePrefixPath
+	storagePrefixPath string = dal_pivot.DefaultStoragePrefixPath
 )
 
 func main() {
@@ -40,14 +40,14 @@ func main() {
 	var store storage.Storage
 
 	fmt.Println("Starting `colly-dal` storage, dsn=", storageBackendDSN, ", prefixPath", storagePrefixPath)
-	conf := &bck_dal.Config{
+	conf := &dal_pivot.Config{
 		PrefixPath: &storageBackendDSN,
 		DSN:        storagePrefixPath,
 		Verbose:    true,
 		Debug:      false,
 		Sanitize:   false,
 	}
-	store, err = bck_dal.NewDataAbstractionLayer(conf)
+	store, err = dal_pivot.NewDataAbstractionLayer(conf)
 	if err != nil {
 		fmt.Println("error while creating a new data abstraction layer instance... error=", err)
 		os.Exit(1)
