@@ -44,3 +44,4 @@ inject plugin
 adaptor
 adapter
 factory
+local infile

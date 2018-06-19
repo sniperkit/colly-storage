@@ -51,7 +51,7 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 	}
 
 	if config.DSN == "" {
-		if config.Scheme == "sqlite" || config.Scheme == "sqlite3" || config.Scheme == "boltdb" || config.Scheme == "badger" {
+		if config.Scheme == "sqlite" || config.Scheme == "sqlite3" || config.Scheme == "boltdb" || config.Scheme == "badger" || config.Scheme == "tiedot" {
 			if err := helper.EnsurePathExists(config.Dataset); err != nil {
 				return nil, err
 			}

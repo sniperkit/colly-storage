@@ -33,11 +33,12 @@ func main() {
 	switch storageBackend {
 	case "sqlite":
 		storageConfig = &dal_pivot.Config{
-			Scheme:  "sqlite",                              // required
-			Host:    "",                                    // required
-			Dataset: "./shared/storage/dal/pivot/colly.db", // required
-			Options: map[string]interface{}{},              // optional
+			Scheme:  "sqlite",                           // required
+			Host:    "",                                 // required
+			Dataset: "./shared/storage/sqlite/colly.db", // required
+			Options: map[string]interface{}{},           // optional
 		}
+
 	case "mysql":
 		storageConfig = &dal_pivot.Config{
 			DSN: `mysql://test:test@localhost:3306/colly?parseTime=True&loc=Local`,
@@ -55,11 +56,6 @@ func main() {
 	case "mongodb":
 		storageConfig = &dal_pivot.Config{
 			DSN: `mongodb://localhost:27017/colly`,
-		}
-
-	case "tiedot":
-		storageConfig = &dal_pivot.Config{
-			DSN: `tiedot://colly`,
 		}
 
 	}
