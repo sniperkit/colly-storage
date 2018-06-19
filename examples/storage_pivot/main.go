@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	// external
 	pp "github.com/k0kubun/pp"
@@ -13,23 +14,9 @@ import (
 )
 
 var (
-	storageDebug      bool   = false
-	storageBackendDSN string = dal_pivot.DefaultBackendDSN
-	//
-	// Backend DSN
-	// ref. https://github.com/ghetzel/pivot/blob/master/backends/backends.go#L41
-	//
-	// sqlite3: 		`sqlite:///./tmp/db_test/test.db`
-	// mysql/mariadb: 	`mysql://test:test@db/test`
-	// dynamoDB: 		`dynamodb://test:test@db/test`
-	// postgres: 		`postgres://test:test@db/test`
-	// file:			`file://%s/`
-	// filesystem: 		`fs://%s/`
-	// filesystem+yaml: `fs+yaml://%s/`
-	// filesystem+json: `fs+json://%s/`
-	// tiedot: 			`tiedot://%s/`
-	// mongodb: 		`mongodb://localhost/test`
-	// elastic: 		`not ready yet`
+	storageDebug        bool          = false
+	storageBackend      string        = "mysql" // use a flag to switch between backends
+	storagePingDuration time.Duration = 5 * time.Second
 )
 
 func main() {
@@ -38,14 +25,45 @@ func main() {
 
 	var err error
 	var store storage.Storage
+	var storageConfig *dal_pivot.Config
 
-	storageConfig := &dal_pivot.Config{
-		Scheme:  "sqlite",                                   // required
-		Host:    "",                                         // required
-		Dataset: "./shared/storage/dal/pivot/colly-data.db", // required
-		Options: map[string]interface{}{},                   // optional
-		// DSN:      storageBackendDSN, // if no DSN provided, the handler will try to make a connection string from upper required parameters
+	switch storageBackend {
+	case "sqlite":
+		storageConfig = &dal_pivot.Config{
+			Scheme:  "sqlite",                                   // required
+			Host:    "",                                         // required
+			Dataset: "./shared/storage/dal/pivot/colly-data.db", // required
+			Options: map[string]interface{}{},                   // optional
+		}
+	case "mysql":
+		storageConfig = &dal_pivot.Config{
+			DSN: `mysql://test:test@localhost:3306/colly-data?parseTime=True&loc=Local`,
+			// mysql://test:test@localhost:3306/colly-data/qeue?parseTime=True&loc=Local`,
+		}
+
+	case "postgres":
+		storageConfig = &dal_pivot.Config{
+			Scheme:  "postgres",                                   // required
+			Host:    "test:test@localhost:5432",                   // required
+			Dataset: "colly-data",                                 // required
+			Options: map[string]interface{}{"sslmode": "disable"}, // optional
+		}
+		storageConfig = &dal_pivot.Config{
+			DSN: `postgres://test:test@localhost:5432/colly-data/qeue?sslmode=disable`,
+		}
+
+	case "mongodb":
+		storageConfig = &dal_pivot.Config{
+			DSN: `mongodb://localhost:27017/colly-data`,
+		}
+
+	case "tiedot":
+		storageConfig = &dal_pivot.Config{
+			DSN: `tiedot://colly-data`,
+		}
+
 	}
+
 	store, err = dal_pivot.NewDataAbstractionLayer(storageConfig)
 	if err != nil {
 		fmt.Println("error while creating a new data abstraction layer instance... error=", err)
@@ -54,9 +72,27 @@ func main() {
 
 	if storageDebug {
 		pp.Println("Storage=", store)
+	} else {
+		store.Action("ping", storagePingDuration)
+		store.Action("list_collections", nil)
 	}
 
 }
+
+/*
+	if config.Config.DB.Adapter == "mysql" {
+		DB, err = gorm.Open("mysql", fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=True&loc=Local", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name))
+		// DB = DB.Set("gorm:table_options", "CHARSET=utf8")
+	} else if config.Config.DB.Adapter == "postgres" {
+		DB, err = gorm.Open("postgres", fmt.Sprintf("postgres://%v:%v@%v/%v?sslmode=disable", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Name))
+	} else if config.Config.DB.Adapter == "sqlite" {
+		DB, err = gorm.Open("sqlite3", fmt.Sprintf("%v/%v", os.TempDir(), dbConfig.Name))
+	} else {
+		panic(errors.New("not supported database adapter"))
+	}
+
+
+*/
 
 /*
 

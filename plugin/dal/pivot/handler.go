@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	// external
 	"github.com/ghetzel/pivot"
@@ -87,6 +88,19 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 	s.conf = config
 
 	return s, nil
+}
+
+func (c *Store) Action(name string, args ...interface{}) (map[string]*interface{}, error) {
+	switch name {
+	case "ping":
+		c.backend.Ping(args[0].(time.Duration))
+
+	case "getCollections":
+		c.backend.ListCollections()
+
+	}
+
+	return nil, errors.New("Action() method is not implemented yet")
 }
 
 func (s *Store) Get(key string) (resp []byte, ok bool) {
