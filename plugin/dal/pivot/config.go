@@ -6,26 +6,17 @@ import (
 
 // Config is...
 type Config struct {
-	Engine         string        `json:"provider" yaml:"provider" config:"store.dal.provider"`
-	DSN            string        `json:"dsn" yaml:"dsn" config:"store.dal.dsn"`
-	PrefixPath     *string       `json:"prefix_path" yaml:"prefix_path" config:"store.dal.prefix_path"`
-	DatabaseName   *string       `json:"database" yaml:"database" config:"store.dal.database"`
-	BucketName     *string       `json:"bucket_name" yaml:"bucket_name" config:"store.dal.provider"`
-	StoragePath    *string       `json:"storage_path" yaml:"storage_path" config:"store.dal.storage_path"`
-	MaxConnections int           `json:"max_connections" yaml:"max_connections" config:"store.dal.max_connections" default:"0"`
-	EnableGzip     bool          `json:"enable_gzip" yaml:"enable_gzip" config:"store.dal.enable_gzip"`
-	ReadOnly       bool          `json:"read_only" yaml:"read_only" config:"store.dal.read_only"`
-	StrictMode     bool          `json:"strict_mode" yaml:"strict_mode" config:"store.dal.strict_mode"`
-	NoSync         bool          `json:"no_sync" yaml:"no_sync" config:"store.dal.no_sync"`
-	NoFreelistSync bool          `json:"no_freelist_sync" yaml:"no_freelist_sync" config:"store.dal.no_freelist_sync"`
-	NoGrowSync     bool          `json:"no_grow_sync" yaml:"no_grow_sync" config:"store.dal.no_grow_sync"`
-	MaxBatchSize   bool          `json:"max_batch_size" yaml:"max_batch_size" config:"store.dal.max_batch_size"`
-	MaxBatchDelay  bool          `json:"max_batch_delay" yaml:"max_batch_delay" config:"store.dal.max_batch_delay"`
-	AllocSize      bool          `json:"alloc_size" yaml:"alloc_size" config:"store.dal.provialloc_sizeder"`
-	Sanitize       bool          `json:"sanitize" yaml:"sanitize" config:"store.dal.sanitize"`
-	Debug          bool          `json:"debug" yaml:"debug" config:"store.dal.debug"`
-	Verbose        bool          `json:"verbose" yaml:"verbose" config:"store.dal.verbose"`
-	done           chan struct{} `json:"-" yaml:"-" toml:"-" xml:"-" config:"-"`
+	Identifier string                 `json:"identifier" yaml:"identifier" toml:"identifier" xml:"identifier" ini:"identifier" config:"store.dal.identifier"`
+	Shorthand  string                 `json:"shorthand" yaml:"shorthand" toml:"shorthand" xml:"shorthand" ini:"shorthand" config:"store.dal.shorthand"`
+	DSN        string                 `json:"dsn" yaml:"dsn" toml:"dsn" xml:"dsn" ini:"dsn" config:"store.dal.dsn"`
+	Scheme     string                 `default:"sqlite" json:"scheme" yaml:"scheme" toml:"scheme" xml:"scheme" ini:"scheme" config:"store.dal.scheme"`
+	Host       string                 `default:"./shared/storage/dal/pivot/colly.db" json:"host" yaml:"host" toml:"host" xml:"host" ini:"host" config:"store.dal.host"`
+	Dataset    string                 `default:"colly-data" json:"dataset" yaml:"dataset" toml:"dataset" xml:"dataset" ini:"dataset" config:"store.dal.dataset"`
+	Options    map[string]interface{} `json:"options" yaml:"options" toml:"options" xml:"options" ini:"options" config:"store.dal.options"`
+	Sanitize   bool                   `json:"sanitize" yaml:"sanitize" config:"store.dal.sanitize" config:"store.dal.sanitize"`
+	Debug      bool                   `json:"debug" yaml:"debug" config:"store.dal.debug" config:"store.dal.debug"`
+	Verbose    bool                   `json:"verbose" yaml:"verbose" config:"store.dal.verbose" config:"store.dal.verbose"`
+	done       chan struct{}          `json:"-" yaml:"-" toml:"-" xml:"-" config:"-" config:"-"`
 }
 
 type backendConfig struct {

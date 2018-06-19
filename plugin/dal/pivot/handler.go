@@ -3,6 +3,7 @@ package dal_pivot
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	// external
@@ -11,13 +12,13 @@ import (
 	"github.com/ghetzel/pivot/dal"
 	"github.com/ghetzel/pivot/mapper"
 
+	// pp "github.com/k0kubun/pp"
+
 	// internal
 	helper "github.com/sniperkit/colly-storage/pkg/helper"
 )
 
 var (
-
-	// sqlite:///./test.db
 	DefaultBackendDSN string = fmt.Sprintf(`sqlite:///%s/%s%s`, DefaultStoragePrefixPath, DefaultStorageDatabaseName, DefaultStorageFileExtension)
 )
 
@@ -26,6 +27,21 @@ type Store struct {
 	backend backends.Backend
 	mapper  mapper.Mapper
 	schema  []*dal.Collection
+	conf    *Config
+}
+
+// alias
+func MakeConnectionString(scheme string, host string, dataset string, options map[string]interface{}) (dal.ConnectionString, error) {
+	return dal.MakeConnectionString(scheme, host, dataset, options)
+}
+
+func checkMissingParameter(params map[string]string) (missing []string) {
+	for k, v := range params {
+		if v == "" {
+			missing = append(missing, k)
+		}
+	}
+	return
 }
 
 func NewDataAbstractionLayer(config *Config) (*Store, error) {
@@ -34,16 +50,24 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 	}
 
 	if config.DSN == "" {
-		config.DSN = DefaultBackendDSN
-	}
-
-	if config.PrefixPath == nil {
-		config.PrefixPath = *DefaultStoragePrefixPath
-	}
-
-	if config.PrefixPath != nil {
-		if err := helper.EnsurePathExists(*config.PrefixPath); err != nil {
+		if config.Scheme == "sqlite" || config.Scheme == "sqlite3" || config.Scheme == "boltdb" || config.Scheme == "badger" {
+			if err := helper.EnsurePathExists(config.Dataset); err != nil {
+				return nil, err
+			}
+		} else {
+			p := map[string]string{
+				"scheme":  config.Scheme,
+				"host":    config.Host,
+				"dataset": config.Dataset,
+			}
+			if missingKeys := checkMissingParameter(p); len(missingKeys) > 0 {
+				return nil, errors.New(fmt.Sprintf("Empty values for required parameters: %s", strings.Join(missingKeys, ",")))
+			}
+		}
+		if conn, err := dal.MakeConnectionString(config.Scheme, config.Host, config.Dataset, config.Options); err != nil {
 			return nil, err
+		} else {
+			config.DSN = conn.String()
 		}
 	}
 
@@ -58,6 +82,9 @@ func NewDataAbstractionLayer(config *Config) (*Store, error) {
 	if err := s.backend.Initialize(); err != nil {
 		return nil, err
 	}
+
+	// copy config
+	s.conf = config
 
 	return s, nil
 }

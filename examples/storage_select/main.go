@@ -12,7 +12,6 @@ import (
 	// internal
 	storage "github.com/sniperkit/colly-storage/pkg"
 	bck_badger "github.com/sniperkit/colly-storage/plugin/backend/badger"
-	bck_badger_lru "github.com/sniperkit/colly-storage/plugin/backend/badger_lru"
 	bck_boltdb "github.com/sniperkit/colly-storage/plugin/backend/boltdb"
 	bck_bboltdb "github.com/sniperkit/colly-storage/plugin/backend/boltdb_bbolt"
 )
@@ -49,19 +48,6 @@ func main() {
 		}
 		// init
 		store, err = bck_badger.New(conf)
-
-	case "badger-lru":
-		// conf
-		conf := &bck_badger_lru.Config{
-			ValueDir:    "colly-storage",
-			StoragePath: filepath.Join(storagePrefixPath, "storage", "badger-lru"),
-			SyncWrites:  false,
-			Debug:       false,
-			Compress:    true,
-			TTL:         time.Duration(120 * 24 * time.Hour),
-		}
-		// init
-		store, err = bck_badger_lru.New(conf)
 
 	case "boltdb":
 		// conf

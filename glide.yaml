@@ -10,6 +10,12 @@ ignore:
 - github.com/sniperkit/pp
 - github.com/mattn/go-sqlite3
 - github.com/rohanthewiz/serr
+- github.com/sniperkit/dbox
+- github.com/sniperkit/dbflex
+- github.com/sniperkit/database
+- github.com/sniperkit/pivot
+- github.com/sniperkit/gorm
+- github.com/sniperkit/libkv
 import:
 - package: github.com/hashicorp/errwrap
 - package: github.com/golang/protobuf
